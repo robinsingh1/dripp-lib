@@ -14,6 +14,7 @@ import {
   SearchPage,
   Boards,
   Dashboard,
+  AuthScreen,
   Home
 } from 'dripp-lib'
 
@@ -31,7 +32,9 @@ class App extends React.Component  {
   render() {
   return (
      <Router>
+       {/* 
       <MainNav />
+      */}
 
         <Switch>
           <Route exact path="/" component={HomeFeed}>
@@ -41,6 +44,8 @@ class App extends React.Component  {
           <Route path="/@:name" component={InfluencerProfile}>
           </Route>
           <Route path="/post/:id" component={InfluencerPostDetails} >
+          </Route>
+          <Route path="/login" component={AuthScreen} >
           </Route>
           <Route path="/influencer/post">
             <InfluencerPost />

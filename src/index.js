@@ -14,7 +14,8 @@ import {
   SearchPage,
   Boards,
   Dashboard,
-  Home
+  Home,
+  AuthScreen
 } from "./App";
 
 export const ExampleComponent = ({ text }) => {
@@ -36,5 +37,6 @@ export {
   SearchPage,
   Boards,
   Dashboard,
-  Home
+  Home,
+  AuthScreen
 }

@@ -928,10 +928,13 @@ export class Boards extends React.Component {
       }
 }
 
+
+
 export function About() {
   return (
     <div>
       <h2>About</h2>
+      
     </div>
   );
 }
@@ -944,6 +947,134 @@ export function Dashboard() {
   );
 }
 
+export class AuthScreen extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      authScreen:true,
+      login:true,
+      signup: false
+    }
+
+    this.loginEmailInput = React.createRef();
+    this.loginPasswordInput = React.createRef();
+
+    this.signupEmailInput = React.createRef();
+    this.signupPasswordInput = React.createRef();
+
+    this.authScreen = React.createRef();
+    this.appScreen = React.createRef();
+  }
+
+  render() {
+    return (
+      <div ref={this.authScreen} style={{width:"100%",textAlign:"center",display:(this.state.authScreen) ? "block": "none"}}>
+          <br/>
+          <br/>
+          <img src="https://storage.googleapis.com/dripp-public/webassets/Group%2033.png" style={{height:100,width:100}}/>
+          <br/>
+          <br/>
+          <br/>
+          <div style={{marginBottom:20}}>
+          <a onClick={() => { 
+                        console.log("signup")
+         this.setState({signup:true,login:false})
+          }} style={{marginRight:10}}>Sign Up</a>
+          |
+          <a style={{marginLeft:10}} onClick={() => { 
+            console.log("login")
+            this.setState({signup:false,login:true})
+
+          }}>Login</a>
+</div>
+          <form id="login-form" style={{display:(this.state.login) ? "block" : "none"}} onSubmit={(e) => { 
+            e.preventDefault()
+            console.log("login form submit")
+          }}>
+          <input ref={this.loginEmailInput} type="text" className="bp3-input bp3-large" id="search-input" placeholder="email" large />
+          <br/>
+          <br/>
+          <input ref={this.loginPasswordInput} type="password" className="bp3-input bp3-large" id="search-input" placeholder="password" large />
+          <br/>
+          <br/>
+          <br/>
+          <button onClick={() => { 
+            console.log(this.loginEmailInput.value)
+            console.log(this.loginPasswordInput.value)
+ 
+            var email = this.loginEmailInput.current.value
+            var password = this.loginPasswordInput.current.value
+            console.log("login",email, password)
+            let _this = this;
+
+            firebase.auth().signInWithEmailAndPassword(email, password)
+            .then((userCredential) => {
+              // Signed in
+              console.log("login user", userCredential)
+              var user = userCredential.user;
+              localStorage.setItem('dryp-auth',JSON.stringify(userCredential))
+              // ...
+              console.log("auth", _this.ref.authScreen)
+              console.log("app",_this.ref.appScreen)
+       
+              _this.setState({appScreen: true, authScreen: false, user: userCredential})
+
+            })
+            .catch((error) => {
+              console.log("error",error)
+              var errorCode = error.code;
+              var errorMessage = error.message;
+            });
+
+          }}>Login</button>
+ 
+          </form>
+
+
+          <form id="signup-form" style={{display:(this.state.signup) ? "block" : "none"}} onSubmit={(e) => { 
+            e.preventDefault()
+            console.log("login")
+          }}>
+          <input ref={this.signupEmailInput} type="text" className="bp3-input bp3-large" id="search-input" placeholder="email" large />
+          <br/>
+          <br/>
+          <input ref={this.signupPasswordInput} type="password" className="bp3-input bp3-large" id="search-input" placeholder="password" large />
+          <br/>
+          <br/>
+          <input type="password" className="bp3-input bp3-large" id="search-input" placeholder="password" large />
+          <br/>
+          <br/>
+          <br/>
+          
+          <button onClick={() => { 
+            console.log(this.signupEmailInput)
+            console.log(this.signupPasswordInput)
+            var email = this.signupEmailInput.current.value
+            var password = this.signupPasswordInput.current.value
+            console.log(email, password)
+            firebase.auth().createUserWithEmailAndPassword(email, password)
+            .then((userCredential) => {
+              // Signed in 
+              console.log(userCredential)
+              var user = userCredential.user;
+              localStorage.setItem('dryp-auth',JSON.stringify(userCredential))
+              // ...
+              this.setState({appScreen: true, authScreen: false, user: userCredential})
+
+            })
+            .catch((error) => {
+              var errorCode = error.code;
+              var errorMessage = error.message;
+              // ..
+            });
+          
+
+          }}>Signup</button>          
+          </form>
+        </div>
+    )
+  }
+}
 
 /*
       <Stories

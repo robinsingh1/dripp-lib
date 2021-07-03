@@ -1321,6 +1321,161 @@ function About() {
 function Dashboard() {
   return /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("h2", null, "Dashboard"));
 }
+class AuthScreen extends React__default.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      authScreen: true,
+      login: true,
+      signup: false
+    };
+    this.loginEmailInput = React__default.createRef();
+    this.loginPasswordInput = React__default.createRef();
+    this.signupEmailInput = React__default.createRef();
+    this.signupPasswordInput = React__default.createRef();
+    this.authScreen = React__default.createRef();
+    this.appScreen = React__default.createRef();
+  }
+
+  render() {
+    return /*#__PURE__*/React__default.createElement("div", {
+      ref: this.authScreen,
+      style: {
+        width: "100%",
+        textAlign: "center",
+        display: this.state.authScreen ? "block" : "none"
+      }
+    }, /*#__PURE__*/React__default.createElement("br", null), /*#__PURE__*/React__default.createElement("br", null), /*#__PURE__*/React__default.createElement("img", {
+      src: "https://storage.googleapis.com/dripp-public/webassets/Group%2033.png",
+      style: {
+        height: 100,
+        width: 100
+      }
+    }), /*#__PURE__*/React__default.createElement("br", null), /*#__PURE__*/React__default.createElement("br", null), /*#__PURE__*/React__default.createElement("br", null), /*#__PURE__*/React__default.createElement("div", {
+      style: {
+        marginBottom: 20
+      }
+    }, /*#__PURE__*/React__default.createElement("a", {
+      onClick: () => {
+        console.log("signup");
+        this.setState({
+          signup: true,
+          login: false
+        });
+      },
+      style: {
+        marginRight: 10
+      }
+    }, "Sign Up"), "|", /*#__PURE__*/React__default.createElement("a", {
+      style: {
+        marginLeft: 10
+      },
+      onClick: () => {
+        console.log("login");
+        this.setState({
+          signup: false,
+          login: true
+        });
+      }
+    }, "Login")), /*#__PURE__*/React__default.createElement("form", {
+      id: "login-form",
+      style: {
+        display: this.state.login ? "block" : "none"
+      },
+      onSubmit: e => {
+        e.preventDefault();
+        console.log("login form submit");
+      }
+    }, /*#__PURE__*/React__default.createElement("input", {
+      ref: this.loginEmailInput,
+      type: "text",
+      className: "bp3-input bp3-large",
+      id: "search-input",
+      placeholder: "email",
+      large: true
+    }), /*#__PURE__*/React__default.createElement("br", null), /*#__PURE__*/React__default.createElement("br", null), /*#__PURE__*/React__default.createElement("input", {
+      ref: this.loginPasswordInput,
+      type: "password",
+      className: "bp3-input bp3-large",
+      id: "search-input",
+      placeholder: "password",
+      large: true
+    }), /*#__PURE__*/React__default.createElement("br", null), /*#__PURE__*/React__default.createElement("br", null), /*#__PURE__*/React__default.createElement("br", null), /*#__PURE__*/React__default.createElement("button", {
+      onClick: () => {
+        console.log(this.loginEmailInput.value);
+        console.log(this.loginPasswordInput.value);
+        var email = this.loginEmailInput.current.value;
+        var password = this.loginPasswordInput.current.value;
+        console.log("login", email, password);
+
+        let _this = this;
+
+        firebase.auth().signInWithEmailAndPassword(email, password).then(userCredential => {
+          console.log("login user", userCredential);
+          localStorage.setItem('dryp-auth', JSON.stringify(userCredential));
+          console.log("auth", _this.ref.authScreen);
+          console.log("app", _this.ref.appScreen);
+
+          _this.setState({
+            appScreen: true,
+            authScreen: false,
+            user: userCredential
+          });
+        }).catch(error => {
+          console.log("error", error);
+        });
+      }
+    }, "Login")), /*#__PURE__*/React__default.createElement("form", {
+      id: "signup-form",
+      style: {
+        display: this.state.signup ? "block" : "none"
+      },
+      onSubmit: e => {
+        e.preventDefault();
+        console.log("login");
+      }
+    }, /*#__PURE__*/React__default.createElement("input", {
+      ref: this.signupEmailInput,
+      type: "text",
+      className: "bp3-input bp3-large",
+      id: "search-input",
+      placeholder: "email",
+      large: true
+    }), /*#__PURE__*/React__default.createElement("br", null), /*#__PURE__*/React__default.createElement("br", null), /*#__PURE__*/React__default.createElement("input", {
+      ref: this.signupPasswordInput,
+      type: "password",
+      className: "bp3-input bp3-large",
+      id: "search-input",
+      placeholder: "password",
+      large: true
+    }), /*#__PURE__*/React__default.createElement("br", null), /*#__PURE__*/React__default.createElement("br", null), /*#__PURE__*/React__default.createElement("input", {
+      type: "password",
+      className: "bp3-input bp3-large",
+      id: "search-input",
+      placeholder: "password",
+      large: true
+    }), /*#__PURE__*/React__default.createElement("br", null), /*#__PURE__*/React__default.createElement("br", null), /*#__PURE__*/React__default.createElement("br", null), /*#__PURE__*/React__default.createElement("button", {
+      onClick: () => {
+        console.log(this.signupEmailInput);
+        console.log(this.signupPasswordInput);
+        var email = this.signupEmailInput.current.value;
+        var password = this.signupPasswordInput.current.value;
+        console.log(email, password);
+        firebase.auth().createUserWithEmailAndPassword(email, password).then(userCredential => {
+          console.log(userCredential);
+          localStorage.setItem('dryp-auth', JSON.stringify(userCredential));
+          this.setState({
+            appScreen: true,
+            authScreen: false,
+            user: userCredential
+          });
+        }).catch(error => {
+        });
+      }
+    }, "Signup")));
+  }
+
+}
 
 const ExampleComponent = ({
   text
@@ -1330,5 +1485,5 @@ const ExampleComponent = ({
   }, "Example Component: ", text);
 };
 
-export { About, Boards, Dashboard, DialogExample, ExampleComponent, Home, HomeFeed, InfluencerPost, InfluencerPostDetails, InfluencerProfile, MainNav, PhotoTile, SearchPage, SelectedImage, photos };
+export { About, AuthScreen, Boards, Dashboard, DialogExample, ExampleComponent, Home, HomeFeed, InfluencerPost, InfluencerPostDetails, InfluencerProfile, MainNav, PhotoTile, SearchPage, SelectedImage, photos };
 //# sourceMappingURL=index.modern.js.map
