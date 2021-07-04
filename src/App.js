@@ -30,6 +30,8 @@ import Carousel, { Modal, ModalGateway } from "react-images";
 import React, { useState, useCallback } from "react";
 import Masonry from 'react-masonry-css'
 import reactImageSize from 'react-image-size';
+import "@blueprintjs/core/lib/css/blueprint.css";
+import "@blueprintjs/icons/lib/css/blueprint-icons.css";
 
 import './App.css';
 
@@ -74,6 +76,7 @@ const uiConfig = {
 console.log(window.location.origin)
 let API_URL = (window.location.origin.includes("localhost")) ? 'http://localhost:5000' : 'https://dripp-py.herokuapp.com'
 API_URL = (window.location.origin.includes("gitpod")) ? 'https://5000-peach-cat-avh4l9cg.ws-us08.gitpod.io' : API_URL
+API_URL = 'https://5000-peach-cat-avh4l9cg.ws-us10.gitpod.io'
 
 
 //API_URL = 'https://dripp-py.herokuapp.com'
@@ -814,18 +817,7 @@ export class ChromePostDetails extends React.Component {
 }
 
 async loadEcomData() {
-  
   let id = null;
-
-  if(this.props.match) {
-    id = this.props.match.params.id
-    console.log("params1", this.props.match.params.id)
-  } else {
-    console.log("else")
-    id = this.props.query.id
-    console.log("id",id)
-  }
-
   let params = {user: 1, url: this.state.currentImage}
   params = new URLSearchParams(params).toString()
   id = 1
@@ -835,71 +827,70 @@ async loadEcomData() {
     this.setState({ecom: ecom})
 }
 
-  async loadData() {
-    console.log(API_URL)
-    let _this = this;
-    if(this.props){
-      console.log("params", this.props)
-      if(this.props.match) {
-        let id = this.props.match.params.id
-        console.log("params1", this.props.match.params.id)
-      } else {
-        console.log("else")
-        let id = this.props.query.id
-        console.log("id",id)
-      }
-    }
-    let id = null;
+async loadData() {
+  console.log(API_URL)
+  let _this = this;
+  if(this.props){
+    console.log("params", this.props)
     if(this.props.match) {
-      id = this.props.match.params.id
+      let id = this.props.match.params.id
       console.log("params1", this.props.match.params.id)
     } else {
       console.log("else")
-      id = this.props.query.id
+      let id = this.props.query.id
       console.log("id",id)
     }
-    
-    console.log("id",id)
-
-    let recs_req = await fetch(`${API_URL}/recs/${id}/${this.state.recsPage}`)
-    let result = await recs_req.json()
-
-    this.setState({recs: result})
-
-    let post = await fetch(`${API_URL}/post/${id}`)
-    post = await post.json()
-    //console.log("current post",post)
-    //console.log("current post",post[0])
-    //post = post[0]
-    post.src = post.url
-    post.width = "auto"
-    post.height = "auto"
-    this.setState({currentPost: post})
-      
-    //console.log("result",result)
-    let feed = result.map(function(img) {
-      //let imgSrc = img.replace("gs://","https://storage.googleapis.com/")      
-      return _this.getSize(img)
-    })   
-
-    feed = await Promise.all(feed)
-
-    let _feed =  this.state.feed
-    let recsPage = this.state.recsPage
-
-    recsPage = recsPage+1
-    console.log("Recs page",recsPage, _feed.length, feed.length)
-    this.setState({
-      feed: _feed.concat(feed),
-      loading:false,
-      recsPage: recsPage
-    });
-      
   }
+  let id = null;
+  if(this.props.match) {
+    id = this.props.match.params.id
+    console.log("params1", this.props.match.params.id)
+  } else {
+    console.log("else")
+    id = this.props.query.id
+    console.log("id",id)
+  }
+  
+  console.log("id",id)
 
+  let recs_req = await fetch(`${API_URL}/recs/${id}/${this.state.recsPage}`)
+  let result = await recs_req.json()
+
+  this.setState({recs: result})
+
+  let post = await fetch(`${API_URL}/post/${id}`)
+  post = await post.json()
+  //console.log("current post",post)
+  //console.log("current post",post[0])
+  //post = post[0]
+  post.src = post.url
+  post.width = "auto"
+  post.height = "auto"
+  this.setState({currentPost: post})
+    
+  //console.log("result",result)
+  let feed = result.map(function(img) {
+    //let imgSrc = img.replace("gs://","https://storage.googleapis.com/")      
+    return _this.getSize(img)
+  })   
+
+  feed = await Promise.all(feed)
+
+  let _feed =  this.state.feed
+  let recsPage = this.state.recsPage
+
+  recsPage = recsPage+1
+  console.log("Recs page",recsPage, _feed.length, feed.length)
+  this.setState({
+    feed: _feed.concat(feed),
+    loading:false,
+    recsPage: recsPage
+  });
+    
+}
 
 componentDidMount(){
-    this.loadData() 
+    //this.loadData() 
     this.loadEcomData() 
 
     console.log("yo did mount")
