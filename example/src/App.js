@@ -9,6 +9,7 @@ import {
   HomeFeed, 
   InfluencerProfile, 
   InfluencerPostDetails,
+  ChromePostDetails,
   InfluencerPost,
   About,
   SearchPage,
@@ -45,6 +46,9 @@ class App extends React.Component  {
           </Route>
           <Route path="/post/:id" component={InfluencerPostDetails} >
           </Route>
+          <Route path="/chrome/:id" component={ChromePostDetails} >
+          </Route>
+
           <Route path="/login" component={AuthScreen} >
           </Route>
           <Route path="/influencer/post">

@@ -771,6 +771,327 @@ export class InfluencerPostDetails extends React.Component {
                 }
 }
 
+export class Template extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+    }
+  }
+
+  render() {
+    return (
+      <div>Test</div>
+    )
+  }
+}
+
+
+export class ChromePostDetails extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      feed: [],
+      currentImage:0,
+      setCurrentImage:0,
+      viewerIsOpen: false,
+      setViewerIsOpen: false,
+      currentPost: "",
+      currentImage:"https://idsb.tmgrup.com.tr/ly/uploads/images/2020/07/08/45343.jpg",
+      recs: [],
+      recsPage:1,
+      loading:true,
+      ecom: []
+    }
+ }
+
+ async getSize(img) {
+  let src = img.url
+  let reactImageSize = (await import('react-image-size')).default
+  let { width, height } = await reactImageSize(src);
+  //console.log(width, height)
+  
+  return {width: width, height: height, src:  src, ...img}
+}
+
+async loadEcomData() {
+  
+  let id = null;
+
+  if(this.props.match) {
+    id = this.props.match.params.id
+    console.log("params1", this.props.match.params.id)
+  } else {
+    console.log("else")
+    id = this.props.query.id
+    console.log("id",id)
+  }
+
+  let params = {user: 1, url: this.state.currentImage}
+  params = new URLSearchParams(params).toString()
+  id = 1
+  let ecom_req = await fetch(`${API_URL}/chrome_ecom/${id}?${params}`,)
+    let ecom = await ecom_req.json()
+    console.log("ecom",ecom)
+    this.setState({ecom: ecom})
+}
+
+  async loadData() {
+    console.log(API_URL)
+    let _this = this;
+    if(this.props){
+      console.log("params", this.props)
+      if(this.props.match) {
+        let id = this.props.match.params.id
+        console.log("params1", this.props.match.params.id)
+      } else {
+        console.log("else")
+        let id = this.props.query.id
+        console.log("id",id)
+      }
+    }
+    let id = null;
+    if(this.props.match) {
+      id = this.props.match.params.id
+      console.log("params1", this.props.match.params.id)
+    } else {
+      console.log("else")
+      id = this.props.query.id
+      console.log("id",id)
+    }
+    
+    console.log("id",id)
+
+    let recs_req = await fetch(`${API_URL}/recs/${id}/${this.state.recsPage}`)
+    let result = await recs_req.json()
+
+    this.setState({recs: result})
+
+    let post = await fetch(`${API_URL}/post/${id}`)
+    post = await post.json()
+    //console.log("current post",post)
+    //console.log("current post",post[0])
+    //post = post[0]
+    post.src = post.url
+    post.width = "auto"
+    post.height = "auto"
+    this.setState({currentPost: post})
+      
+    //console.log("result",result)
+    let feed = result.map(function(img) {
+      //let imgSrc = img.replace("gs://","https://storage.googleapis.com/")      
+      return _this.getSize(img)
+    })   
+
+    feed = await Promise.all(feed)
+
+    let _feed =  this.state.feed
+    let recsPage = this.state.recsPage
+
+    recsPage = recsPage+1
+    console.log("Recs page",recsPage, _feed.length, feed.length)
+    this.setState({
+      feed: _feed.concat(feed),
+      loading:false,
+      recsPage: recsPage
+    });
+      
+  }
+
+
+componentDidMount(){
+    this.loadData() 
+    this.loadEcomData() 
+
+    console.log("yo did mount")
+    window.addEventListener('scroll', (e) => { 
+      this.loadMore() 
+    });
+
+    document.querySelectorAll("*").forEach(element => element.addEventListener("scroll", ({target}) => console.log(target, target.id, target.parent, target.parent.id)));
+
+    this.authFirebaseListener = firebase.auth().onAuthStateChanged((user) => {
+      console.log("user",user)
+      this.setState({user})
+  
+      this.setState({
+        loading: false,  // For the loader maybe
+        user, // User Details
+        isAuth: true
+      });
+      let db = firebase.firestore();
+      let _this = this;
+      
+      let uid = (user) ? user.uid : null
+      if(uid) { 
+        db.collection("Board").where("userId", "==", uid).get()
+            .then(function(boards){
+              console.log("boards",boards)
+              let data = []  
+              boards.forEach((doc) => {
+                // doc.data() is never undefined for query doc snapshots
+                //console.log(doc.id, " => ", doc.data());
+                //return doc.data()
+                let d = doc.data()
+                d["id"] = doc.id
+                data.push(d)
+              })
+              console.log(data)
+    
+              _this.setState({"boards":data})
+            })
+      }
+    });
+  }
+componentWillUnmount(){
+    console.log("unmount")
+    window.removeEventListener('scroll', this.loadMore);
+    this.authFirebaseListener && this.authFirebaseListener() // Unlisten it by calling it as a function
+  }
+
+debounce(method, delay) {
+    clearTimeout(method._tId);
+    method._tId= setTimeout(function(){
+        method();
+    }, delay);
+}
+
+loadMore() {
+  //console.log('scroll')
+  if (window.innerHeight + document.documentElement.scrollTop  === document.scrollingElement.scrollHeight) {
+    if(!this.state.loading) {
+      console.log("LOAD")
+      this.setState({loading:true})
+      this.loadData()
+    }
+  }
+}
+
+render() {
+    return (
+    <div>
+      <br/>
+      <br/>
+      <br/>
+      <div style={{fontWeight:800,fontSize:20,margin:20}}>Shop this look</div>
+      <div style={{marginLeft:10,marginRight:20,paddingTop:0,paddingLeft:0,
+    borderRadius: 20}} className="post-details-area">
+        <div style={{width:"90%",position:"relative",height:200,display:"block",backgroundColor:"#fff",
+                      borderTopLeftRadius:20,borderBottomLeftRadius:20}}>
+    
+         <img
+            id="main"
+            alt={this.state.currentPost.title}
+            src={this.state.currentImage}
+            style={{boxShadow: '0px 10px 30px rgb(0 0 0 / 25%)', borderTopLeftRadius:20,borderBottomLeftRadius:20,borderRadius:20,opacity:1,top:0,left:0,zIndex:3,height:630,maxWidth:"80%",maxHeight:"100%",marginRight:"auto",marginLeft:"auto"}}
+        />
+        </div>
+      <div style={{paddingLeft:20,marginTop:-600,marginBottom:75,marginLeft:350,float:"right",width:"40%",display:"none"}}>
+        <h2 style={{fontWeight:800,fontSize:25,paddingTop:10,paddingBottom:10}}>Chrome This Look 
+
+        <a style={{marginLeft:50,fontSize:20}} href={(this.state.currentPost) ? `/@${this.state.currentPost.src.split("/")[5]}` : ""} >
+        {(this.state.currentPost) ? `@${this.state.currentPost.src.split("/")[5]}` : ""}
+        </a>
+        </h2>
+        <hr style={{marginBottom:10,width:"70%"}} />
+ 
+        
+           <div style={{height:250,width:"100%",overflowX:"scroll" ,
+                      display: "flex",
+                      //flexWrap: "wrap",
+                      //flexDirection: "column",
+                      overflowY:"hidden",
+                      overflowX: "scroll"}}>
+            {//[...Array(15).keys()].map(function(){
+              this.state.ecom.slice(0, 4).map(function(item){
+                //console.log("ecom",item)
+              return  (
+                <div style={{margin:5,borderRadius:5,height:250,width:170}}>
+                  <a href={`/p/${item["id"]}`}>
+                  <img src={item.img_url} style={{height:200,width:"auto",borderRadius:5}}/>
+                  <h5 style={{margin:0}}>{item["og:title"]}: ${item["og:price:amount"]}</h5>
+                  <h5 style={{margin:0}}>Aritzia</h5>
+                 <div style={{display:"inline-block",margin:5, height:150,width:150,backgroundColor:"blue",visibility:"hidden"}}></div>
+                  </a>
+                </div>
+              )
+            })}
+          </div>
+          
+           <div style={{height:250,width:"100%",overflowX:"scroll" ,overflowY: "hidden",
+                      display: "flex",
+                      //flexWrap: "wrap",
+                      //flexDirection: "column",
+                      overflowX: "scroll"}}>
+           {//[...Array(15).keys()].map(function(){
+              this.state.ecom.slice(4, 8).map(function(item){
+                //console.log("ecom",item)
+              return  (
+                <div style={{margin:5,borderRadius:5,height:250,width:170}}>
+                  <a href={item["og:url"]}>
+                  <img src={item.img_url} style={{height:200,width:"auto",borderRadius:5}}/>
+                  <h5 style={{margin:0}}>{item["og:title"]}: ${item["og:price:amount"]}</h5>
+                  <h5 style={{margin:0}}>Aritzia</h5>
+                 <div style={{display:"inline-block",margin:5, height:150,width:150,backgroundColor:"blue",visibility:"hidden"}}></div>
+                  </a>
+                </div>
+              )
+            })}
+          </div>
+        <div>
+        </div>
+        
+      </div>
+      </div>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+
+
+      <div style={{marginLeft:0,marginRight:0,marginTop:-50}}>
+      <div style={{fontWeight:800,fontSize:20,margin:10}}>Retailers</div>
+
+      {this.state.ecom.slice(0, 24).map(function(item){
+           return (
+           <div style={{margin:5,borderRadius:5,height:200,width:150,display:"inline-block"}}>
+              <a href={`/p/${item["id"]}`}>
+              <img src={item.img_url} style={{height:200,width:"auto",borderRadius:5}}/>
+              <h5 style={{margin:0}}>{item["og:title"]}: ${item["og:price:amount"]}</h5>
+              <h5 style={{margin:0}}>Aritzia</h5>
+              </a>
+            </div>
+           )
+       })}
+      {(this.state.feed.length) ? 
+      <div>
+
+      <Gallery photos={this.state.feed} 
+                columns={5}
+                margin={7}
+                renderImage={props => { 
+                  console.log("post detail", props)
+                  return <SelectedImage {...props} boards={this.state.boards} user={this.state.user}/>
+                }}
+                direction={"column"} 
+                  onClick={(e, i, a) => {
+                    let inf = i.photo.src.split("/")[5]
+                    window.location.href=`/influencer/${inf}`
+                  } }
+                /> 
+
+                <div style={{marginBottom:20,marginTop:10,visibility:(this.state.loading) ? "visible": "hidden"}}>
+                <Spinner size={20} />
+                <br/><br/>
+                </div> 
+                </div>
+                : <div/> }
+      </div>
+    </div>
+  );
+                }
+}
+
+
 export class SearchPage extends React.Component {
   constructor(props) {
     super(props)

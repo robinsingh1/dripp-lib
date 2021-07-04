@@ -1165,6 +1165,420 @@ class InfluencerPostDetails extends React__default.Component {
   }
 
 }
+class ChromePostDetails extends React__default.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      feed: [],
+      currentImage: 0,
+      setCurrentImage: 0,
+      viewerIsOpen: false,
+      setViewerIsOpen: false,
+      currentPost: "",
+      currentImage: "https://idsb.tmgrup.com.tr/ly/uploads/images/2020/07/08/45343.jpg",
+      recs: [],
+      recsPage: 1,
+      loading: true,
+      ecom: []
+    };
+  }
+
+  async getSize(img) {
+    let src = img.url;
+    let reactImageSize = (await import('react-image-size')).default;
+    let {
+      width,
+      height
+    } = await reactImageSize(src);
+    return {
+      width: width,
+      height: height,
+      src: src,
+      ...img
+    };
+  }
+
+  async loadEcomData() {
+    let id = null;
+
+    if (this.props.match) {
+      id = this.props.match.params.id;
+      console.log("params1", this.props.match.params.id);
+    } else {
+      console.log("else");
+      id = this.props.query.id;
+      console.log("id", id);
+    }
+
+    let params = {
+      user: 1,
+      url: this.state.currentImage
+    };
+    params = new URLSearchParams(params).toString();
+    id = 1;
+    let ecom_req = await fetch(`${API_URL}/chrome_ecom/${id}?${params}`);
+    let ecom = await ecom_req.json();
+    console.log("ecom", ecom);
+    this.setState({
+      ecom: ecom
+    });
+  }
+
+  async loadData() {
+    console.log(API_URL);
+
+    let _this = this;
+
+    if (this.props) {
+      console.log("params", this.props);
+
+      if (this.props.match) {
+        console.log("params1", this.props.match.params.id);
+      } else {
+        console.log("else");
+        let _id2 = this.props.query.id;
+        console.log("id", _id2);
+      }
+    }
+
+    let id = null;
+
+    if (this.props.match) {
+      id = this.props.match.params.id;
+      console.log("params1", this.props.match.params.id);
+    } else {
+      console.log("else");
+      id = this.props.query.id;
+      console.log("id", id);
+    }
+
+    console.log("id", id);
+    let recs_req = await fetch(`${API_URL}/recs/${id}/${this.state.recsPage}`);
+    let result = await recs_req.json();
+    this.setState({
+      recs: result
+    });
+    let post = await fetch(`${API_URL}/post/${id}`);
+    post = await post.json();
+    post.src = post.url;
+    post.width = "auto";
+    post.height = "auto";
+    this.setState({
+      currentPost: post
+    });
+    let feed = result.map(function (img) {
+      return _this.getSize(img);
+    });
+    feed = await Promise.all(feed);
+    let _feed = this.state.feed;
+    let recsPage = this.state.recsPage;
+    recsPage = recsPage + 1;
+    console.log("Recs page", recsPage, _feed.length, feed.length);
+    this.setState({
+      feed: _feed.concat(feed),
+      loading: false,
+      recsPage: recsPage
+    });
+  }
+
+  componentDidMount() {
+    this.loadData();
+    this.loadEcomData();
+    console.log("yo did mount");
+    window.addEventListener('scroll', e => {
+      this.loadMore();
+    });
+    document.querySelectorAll("*").forEach(element => element.addEventListener("scroll", ({
+      target
+    }) => console.log(target, target.id, target.parent, target.parent.id)));
+    this.authFirebaseListener = firebase.auth().onAuthStateChanged(user => {
+      console.log("user", user);
+      this.setState({
+        user
+      });
+      this.setState({
+        loading: false,
+        user,
+        isAuth: true
+      });
+      let db = firebase.firestore();
+
+      let _this = this;
+
+      let uid = user ? user.uid : null;
+
+      if (uid) {
+        db.collection("Board").where("userId", "==", uid).get().then(function (boards) {
+          console.log("boards", boards);
+          let data = [];
+          boards.forEach(doc => {
+            let d = doc.data();
+            d["id"] = doc.id;
+            data.push(d);
+          });
+          console.log(data);
+
+          _this.setState({
+            "boards": data
+          });
+        });
+      }
+    });
+  }
+
+  componentWillUnmount() {
+    console.log("unmount");
+    window.removeEventListener('scroll', this.loadMore);
+    this.authFirebaseListener && this.authFirebaseListener();
+  }
+
+  debounce(method, delay) {
+    clearTimeout(method._tId);
+    method._tId = setTimeout(function () {
+      method();
+    }, delay);
+  }
+
+  loadMore() {
+    if (window.innerHeight + document.documentElement.scrollTop === document.scrollingElement.scrollHeight) {
+      if (!this.state.loading) {
+        console.log("LOAD");
+        this.setState({
+          loading: true
+        });
+        this.loadData();
+      }
+    }
+  }
+
+  render() {
+    return /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("br", null), /*#__PURE__*/React__default.createElement("br", null), /*#__PURE__*/React__default.createElement("br", null), /*#__PURE__*/React__default.createElement("div", {
+      style: {
+        fontWeight: 800,
+        fontSize: 20,
+        margin: 20
+      }
+    }, "Shop this look"), /*#__PURE__*/React__default.createElement("div", {
+      style: {
+        marginLeft: 10,
+        marginRight: 20,
+        paddingTop: 0,
+        paddingLeft: 0,
+        borderRadius: 20
+      },
+      className: "post-details-area"
+    }, /*#__PURE__*/React__default.createElement("div", {
+      style: {
+        width: "90%",
+        position: "relative",
+        height: 200,
+        display: "block",
+        backgroundColor: "#fff",
+        borderTopLeftRadius: 20,
+        borderBottomLeftRadius: 20
+      }
+    }, /*#__PURE__*/React__default.createElement("img", {
+      id: "main",
+      alt: this.state.currentPost.title,
+      src: this.state.currentImage,
+      style: {
+        boxShadow: '0px 10px 30px rgb(0 0 0 / 25%)',
+        borderTopLeftRadius: 20,
+        borderBottomLeftRadius: 20,
+        borderRadius: 20,
+        opacity: 1,
+        top: 0,
+        left: 0,
+        zIndex: 3,
+        height: 630,
+        maxWidth: "80%",
+        maxHeight: "100%",
+        marginRight: "auto",
+        marginLeft: "auto"
+      }
+    })), /*#__PURE__*/React__default.createElement("div", {
+      style: {
+        paddingLeft: 20,
+        marginTop: -600,
+        marginBottom: 75,
+        marginLeft: 350,
+        float: "right",
+        width: "40%",
+        display: "none"
+      }
+    }, /*#__PURE__*/React__default.createElement("h2", {
+      style: {
+        fontWeight: 800,
+        fontSize: 25,
+        paddingTop: 10,
+        paddingBottom: 10
+      }
+    }, "Chrome This Look", /*#__PURE__*/React__default.createElement("a", {
+      style: {
+        marginLeft: 50,
+        fontSize: 20
+      },
+      href: this.state.currentPost ? `/@${this.state.currentPost.src.split("/")[5]}` : ""
+    }, this.state.currentPost ? `@${this.state.currentPost.src.split("/")[5]}` : "")), /*#__PURE__*/React__default.createElement("hr", {
+      style: {
+        marginBottom: 10,
+        width: "70%"
+      }
+    }), /*#__PURE__*/React__default.createElement("div", {
+      style: {
+        height: 250,
+        width: "100%",
+        overflowX: "scroll",
+        display: "flex",
+        overflowY: "hidden",
+        overflowX: "scroll"
+      }
+    }, this.state.ecom.slice(0, 4).map(function (item) {
+      return /*#__PURE__*/React__default.createElement("div", {
+        style: {
+          margin: 5,
+          borderRadius: 5,
+          height: 250,
+          width: 170
+        }
+      }, /*#__PURE__*/React__default.createElement("a", {
+        href: `/p/${item["id"]}`
+      }, /*#__PURE__*/React__default.createElement("img", {
+        src: item.img_url,
+        style: {
+          height: 200,
+          width: "auto",
+          borderRadius: 5
+        }
+      }), /*#__PURE__*/React__default.createElement("h5", {
+        style: {
+          margin: 0
+        }
+      }, item["og:title"], ": $", item["og:price:amount"]), /*#__PURE__*/React__default.createElement("h5", {
+        style: {
+          margin: 0
+        }
+      }, "Aritzia"), /*#__PURE__*/React__default.createElement("div", {
+        style: {
+          display: "inline-block",
+          margin: 5,
+          height: 150,
+          width: 150,
+          backgroundColor: "blue",
+          visibility: "hidden"
+        }
+      })));
+    })), /*#__PURE__*/React__default.createElement("div", {
+      style: {
+        height: 250,
+        width: "100%",
+        overflowX: "scroll",
+        overflowY: "hidden",
+        display: "flex",
+        overflowX: "scroll"
+      }
+    }, this.state.ecom.slice(4, 8).map(function (item) {
+      return /*#__PURE__*/React__default.createElement("div", {
+        style: {
+          margin: 5,
+          borderRadius: 5,
+          height: 250,
+          width: 170
+        }
+      }, /*#__PURE__*/React__default.createElement("a", {
+        href: item["og:url"]
+      }, /*#__PURE__*/React__default.createElement("img", {
+        src: item.img_url,
+        style: {
+          height: 200,
+          width: "auto",
+          borderRadius: 5
+        }
+      }), /*#__PURE__*/React__default.createElement("h5", {
+        style: {
+          margin: 0
+        }
+      }, item["og:title"], ": $", item["og:price:amount"]), /*#__PURE__*/React__default.createElement("h5", {
+        style: {
+          margin: 0
+        }
+      }, "Aritzia"), /*#__PURE__*/React__default.createElement("div", {
+        style: {
+          display: "inline-block",
+          margin: 5,
+          height: 150,
+          width: 150,
+          backgroundColor: "blue",
+          visibility: "hidden"
+        }
+      })));
+    })), /*#__PURE__*/React__default.createElement("div", null))), /*#__PURE__*/React__default.createElement("br", null), /*#__PURE__*/React__default.createElement("br", null), /*#__PURE__*/React__default.createElement("br", null), /*#__PURE__*/React__default.createElement("br", null), /*#__PURE__*/React__default.createElement("div", {
+      style: {
+        marginLeft: 0,
+        marginRight: 0,
+        marginTop: -50
+      }
+    }, /*#__PURE__*/React__default.createElement("div", {
+      style: {
+        fontWeight: 800,
+        fontSize: 20,
+        margin: 10
+      }
+    }, "Retailers"), this.state.ecom.slice(0, 24).map(function (item) {
+      return /*#__PURE__*/React__default.createElement("div", {
+        style: {
+          margin: 5,
+          borderRadius: 5,
+          height: 200,
+          width: 150,
+          display: "inline-block"
+        }
+      }, /*#__PURE__*/React__default.createElement("a", {
+        href: `/p/${item["id"]}`
+      }, /*#__PURE__*/React__default.createElement("img", {
+        src: item.img_url,
+        style: {
+          height: 200,
+          width: "auto",
+          borderRadius: 5
+        }
+      }), /*#__PURE__*/React__default.createElement("h5", {
+        style: {
+          margin: 0
+        }
+      }, item["og:title"], ": $", item["og:price:amount"]), /*#__PURE__*/React__default.createElement("h5", {
+        style: {
+          margin: 0
+        }
+      }, "Aritzia")));
+    }), this.state.feed.length ? /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement(Gallery, {
+      photos: this.state.feed,
+      columns: 5,
+      margin: 7,
+      renderImage: props => {
+        console.log("post detail", props);
+        return /*#__PURE__*/React__default.createElement(SelectedImage, Object.assign({}, props, {
+          boards: this.state.boards,
+          user: this.state.user
+        }));
+      },
+      direction: "column",
+      onClick: (e, i, a) => {
+        let inf = i.photo.src.split("/")[5];
+        window.location.href = `/influencer/${inf}`;
+      }
+    }), /*#__PURE__*/React__default.createElement("div", {
+      style: {
+        marginBottom: 20,
+        marginTop: 10,
+        visibility: this.state.loading ? "visible" : "hidden"
+      }
+    }, /*#__PURE__*/React__default.createElement(Spinner, {
+      size: 20
+    }), /*#__PURE__*/React__default.createElement("br", null), /*#__PURE__*/React__default.createElement("br", null))) : /*#__PURE__*/React__default.createElement("div", null)));
+  }
+
+}
 class SearchPage extends React__default.Component {
   constructor(props) {
     super(props);
@@ -1485,5 +1899,5 @@ const ExampleComponent = ({
   }, "Example Component: ", text);
 };
 
-export { About, AuthScreen, Boards, Dashboard, DialogExample, ExampleComponent, Home, HomeFeed, InfluencerPost, InfluencerPostDetails, InfluencerProfile, MainNav, PhotoTile, SearchPage, SelectedImage, photos };
+export { About, AuthScreen, Boards, ChromePostDetails, Dashboard, DialogExample, ExampleComponent, Home, HomeFeed, InfluencerPost, InfluencerPostDetails, InfluencerProfile, MainNav, PhotoTile, SearchPage, SelectedImage, photos };
 //# sourceMappingURL=index.modern.js.map

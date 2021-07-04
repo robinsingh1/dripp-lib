@@ -1,5 +1,24 @@
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
+function _interopNamespace(e) {
+  if (e && e.__esModule) { return e; } else {
+    var n = {};
+    if (e) {
+      Object.keys(e).forEach(function (k) {
+        var d = Object.getOwnPropertyDescriptor(e, k);
+        Object.defineProperty(n, k, d.get ? d : {
+          enumerable: true,
+          get: function () {
+            return e[k];
+          }
+        });
+      });
+    }
+    n['default'] = e;
+    return n;
+  }
+}
+
 var React = require('react');
 var React__default = _interopDefault(React);
 var core = require('@blueprintjs/core');
@@ -1317,14 +1336,472 @@ var InfluencerPostDetails = /*#__PURE__*/function (_React$Component5) {
 
   return InfluencerPostDetails;
 }(React__default.Component);
-var SearchPage = /*#__PURE__*/function (_React$Component6) {
-  _inheritsLoose(SearchPage, _React$Component6);
+var ChromePostDetails = /*#__PURE__*/function (_React$Component7) {
+  _inheritsLoose(ChromePostDetails, _React$Component7);
+
+  function ChromePostDetails(props) {
+    var _this19$state;
+
+    var _this19;
+
+    _this19 = _React$Component7.call(this, props) || this;
+    _this19.state = (_this19$state = {
+      feed: [],
+      currentImage: 0,
+      setCurrentImage: 0,
+      viewerIsOpen: false,
+      setViewerIsOpen: false,
+      currentPost: ""
+    }, _this19$state["currentImage"] = "https://idsb.tmgrup.com.tr/ly/uploads/images/2020/07/08/45343.jpg", _this19$state.recs = [], _this19$state.recsPage = 1, _this19$state.loading = true, _this19$state.ecom = [], _this19$state);
+    return _this19;
+  }
+
+  var _proto7 = ChromePostDetails.prototype;
+
+  _proto7.getSize = function getSize(img) {
+    try {
+      var src = img.url;
+      return Promise.resolve(new Promise(function (resolve) { resolve(_interopNamespace(require('react-image-size'))); })).then(function (_import) {
+        var reactImageSize = _import["default"];
+        return Promise.resolve(reactImageSize(src)).then(function (_ref8) {
+          var width = _ref8.width,
+              height = _ref8.height;
+          return _extends({
+            width: width,
+            height: height,
+            src: src
+          }, img);
+        });
+      });
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  };
+
+  _proto7.loadEcomData = function loadEcomData() {
+    try {
+      var _this21 = this;
+
+      var id = null;
+
+      if (_this21.props.match) {
+        id = _this21.props.match.params.id;
+        console.log("params1", _this21.props.match.params.id);
+      } else {
+        console.log("else");
+        id = _this21.props.query.id;
+        console.log("id", id);
+      }
+
+      var params = {
+        user: 1,
+        url: _this21.state.currentImage
+      };
+      params = new URLSearchParams(params).toString();
+      id = 1;
+      return Promise.resolve(fetch(API_URL + "/chrome_ecom/" + id + "?" + params)).then(function (ecom_req) {
+        return Promise.resolve(ecom_req.json()).then(function (ecom) {
+          console.log("ecom", ecom);
+
+          _this21.setState({
+            ecom: ecom
+          });
+        });
+      });
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  };
+
+  _proto7.loadData = function loadData() {
+    try {
+      var _this23 = this;
+
+      console.log(API_URL);
+      var _this = _this23;
+
+      if (_this23.props) {
+        console.log("params", _this23.props);
+
+        if (_this23.props.match) {
+          var _id = _this23.props.match.params.id;
+          console.log("params1", _this23.props.match.params.id);
+        } else {
+          console.log("else");
+          var _id2 = _this23.props.query.id;
+          console.log("id", _id2);
+        }
+      }
+
+      var id = null;
+
+      if (_this23.props.match) {
+        id = _this23.props.match.params.id;
+        console.log("params1", _this23.props.match.params.id);
+      } else {
+        console.log("else");
+        id = _this23.props.query.id;
+        console.log("id", id);
+      }
+
+      console.log("id", id);
+      return Promise.resolve(fetch(API_URL + "/recs/" + id + "/" + _this23.state.recsPage)).then(function (recs_req) {
+        return Promise.resolve(recs_req.json()).then(function (result) {
+          _this23.setState({
+            recs: result
+          });
+
+          return Promise.resolve(fetch(API_URL + "/post/" + id)).then(function (post) {
+            return Promise.resolve(post.json()).then(function (_post$json2) {
+              post = _post$json2;
+              post.src = post.url;
+              post.width = "auto";
+              post.height = "auto";
+
+              _this23.setState({
+                currentPost: post
+              });
+
+              var feed = result.map(function (img) {
+                return _this.getSize(img);
+              });
+              return Promise.resolve(Promise.all(feed)).then(function (_Promise$all4) {
+                feed = _Promise$all4;
+                var _feed = _this23.state.feed;
+                var recsPage = _this23.state.recsPage;
+                recsPage = recsPage + 1;
+                console.log("Recs page", recsPage, _feed.length, feed.length);
+
+                _this23.setState({
+                  feed: _feed.concat(feed),
+                  loading: false,
+                  recsPage: recsPage
+                });
+              });
+            });
+          });
+        });
+      });
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  };
+
+  _proto7.componentDidMount = function componentDidMount() {
+    var _this24 = this;
+
+    this.loadData();
+    this.loadEcomData();
+    console.log("yo did mount");
+    window.addEventListener('scroll', function (e) {
+      _this24.loadMore();
+    });
+    document.querySelectorAll("*").forEach(function (element) {
+      return element.addEventListener("scroll", function (_ref9) {
+        var target = _ref9.target;
+        return console.log(target, target.id, target.parent, target.parent.id);
+      });
+    });
+    this.authFirebaseListener = firebase.auth().onAuthStateChanged(function (user) {
+      console.log("user", user);
+
+      _this24.setState({
+        user: user
+      });
+
+      _this24.setState({
+        loading: false,
+        user: user,
+        isAuth: true
+      });
+
+      var db = firebase.firestore();
+      var _this = _this24;
+      var uid = user ? user.uid : null;
+
+      if (uid) {
+        db.collection("Board").where("userId", "==", uid).get().then(function (boards) {
+          console.log("boards", boards);
+          var data = [];
+          boards.forEach(function (doc) {
+            var d = doc.data();
+            d["id"] = doc.id;
+            data.push(d);
+          });
+          console.log(data);
+
+          _this.setState({
+            "boards": data
+          });
+        });
+      }
+    });
+  };
+
+  _proto7.componentWillUnmount = function componentWillUnmount() {
+    console.log("unmount");
+    window.removeEventListener('scroll', this.loadMore);
+    this.authFirebaseListener && this.authFirebaseListener();
+  };
+
+  _proto7.debounce = function debounce(method, delay) {
+    clearTimeout(method._tId);
+    method._tId = setTimeout(function () {
+      method();
+    }, delay);
+  };
+
+  _proto7.loadMore = function loadMore() {
+    if (window.innerHeight + document.documentElement.scrollTop === document.scrollingElement.scrollHeight) {
+      if (!this.state.loading) {
+        console.log("LOAD");
+        this.setState({
+          loading: true
+        });
+        this.loadData();
+      }
+    }
+  };
+
+  _proto7.render = function render() {
+    var _ref10,
+        _ref11,
+        _this25 = this;
+
+    return /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("br", null), /*#__PURE__*/React__default.createElement("br", null), /*#__PURE__*/React__default.createElement("br", null), /*#__PURE__*/React__default.createElement("div", {
+      style: {
+        fontWeight: 800,
+        fontSize: 20,
+        margin: 20
+      }
+    }, "Shop this look"), /*#__PURE__*/React__default.createElement("div", {
+      style: {
+        marginLeft: 10,
+        marginRight: 20,
+        paddingTop: 0,
+        paddingLeft: 0,
+        borderRadius: 20
+      },
+      className: "post-details-area"
+    }, /*#__PURE__*/React__default.createElement("div", {
+      style: {
+        width: "90%",
+        position: "relative",
+        height: 200,
+        display: "block",
+        backgroundColor: "#fff",
+        borderTopLeftRadius: 20,
+        borderBottomLeftRadius: 20
+      }
+    }, /*#__PURE__*/React__default.createElement("img", {
+      id: "main",
+      alt: this.state.currentPost.title,
+      src: this.state.currentImage,
+      style: {
+        boxShadow: '0px 10px 30px rgb(0 0 0 / 25%)',
+        borderTopLeftRadius: 20,
+        borderBottomLeftRadius: 20,
+        borderRadius: 20,
+        opacity: 1,
+        top: 0,
+        left: 0,
+        zIndex: 3,
+        height: 630,
+        maxWidth: "80%",
+        maxHeight: "100%",
+        marginRight: "auto",
+        marginLeft: "auto"
+      }
+    })), /*#__PURE__*/React__default.createElement("div", {
+      style: {
+        paddingLeft: 20,
+        marginTop: -600,
+        marginBottom: 75,
+        marginLeft: 350,
+        "float": "right",
+        width: "40%",
+        display: "none"
+      }
+    }, /*#__PURE__*/React__default.createElement("h2", {
+      style: {
+        fontWeight: 800,
+        fontSize: 25,
+        paddingTop: 10,
+        paddingBottom: 10
+      }
+    }, "Chrome This Look", /*#__PURE__*/React__default.createElement("a", {
+      style: {
+        marginLeft: 50,
+        fontSize: 20
+      },
+      href: this.state.currentPost ? "/@" + this.state.currentPost.src.split("/")[5] : ""
+    }, this.state.currentPost ? "@" + this.state.currentPost.src.split("/")[5] : "")), /*#__PURE__*/React__default.createElement("hr", {
+      style: {
+        marginBottom: 10,
+        width: "70%"
+      }
+    }), /*#__PURE__*/React__default.createElement("div", {
+      style: (_ref10 = {
+        height: 250,
+        width: "100%",
+        overflowX: "scroll",
+        display: "flex",
+        overflowY: "hidden"
+      }, _ref10["overflowX"] = "scroll", _ref10)
+    }, this.state.ecom.slice(0, 4).map(function (item) {
+      return /*#__PURE__*/React__default.createElement("div", {
+        style: {
+          margin: 5,
+          borderRadius: 5,
+          height: 250,
+          width: 170
+        }
+      }, /*#__PURE__*/React__default.createElement("a", {
+        href: "/p/" + item["id"]
+      }, /*#__PURE__*/React__default.createElement("img", {
+        src: item.img_url,
+        style: {
+          height: 200,
+          width: "auto",
+          borderRadius: 5
+        }
+      }), /*#__PURE__*/React__default.createElement("h5", {
+        style: {
+          margin: 0
+        }
+      }, item["og:title"], ": $", item["og:price:amount"]), /*#__PURE__*/React__default.createElement("h5", {
+        style: {
+          margin: 0
+        }
+      }, "Aritzia"), /*#__PURE__*/React__default.createElement("div", {
+        style: {
+          display: "inline-block",
+          margin: 5,
+          height: 150,
+          width: 150,
+          backgroundColor: "blue",
+          visibility: "hidden"
+        }
+      })));
+    })), /*#__PURE__*/React__default.createElement("div", {
+      style: (_ref11 = {
+        height: 250,
+        width: "100%",
+        overflowX: "scroll",
+        overflowY: "hidden",
+        display: "flex"
+      }, _ref11["overflowX"] = "scroll", _ref11)
+    }, this.state.ecom.slice(4, 8).map(function (item) {
+      return /*#__PURE__*/React__default.createElement("div", {
+        style: {
+          margin: 5,
+          borderRadius: 5,
+          height: 250,
+          width: 170
+        }
+      }, /*#__PURE__*/React__default.createElement("a", {
+        href: item["og:url"]
+      }, /*#__PURE__*/React__default.createElement("img", {
+        src: item.img_url,
+        style: {
+          height: 200,
+          width: "auto",
+          borderRadius: 5
+        }
+      }), /*#__PURE__*/React__default.createElement("h5", {
+        style: {
+          margin: 0
+        }
+      }, item["og:title"], ": $", item["og:price:amount"]), /*#__PURE__*/React__default.createElement("h5", {
+        style: {
+          margin: 0
+        }
+      }, "Aritzia"), /*#__PURE__*/React__default.createElement("div", {
+        style: {
+          display: "inline-block",
+          margin: 5,
+          height: 150,
+          width: 150,
+          backgroundColor: "blue",
+          visibility: "hidden"
+        }
+      })));
+    })), /*#__PURE__*/React__default.createElement("div", null))), /*#__PURE__*/React__default.createElement("br", null), /*#__PURE__*/React__default.createElement("br", null), /*#__PURE__*/React__default.createElement("br", null), /*#__PURE__*/React__default.createElement("br", null), /*#__PURE__*/React__default.createElement("div", {
+      style: {
+        marginLeft: 0,
+        marginRight: 0,
+        marginTop: -50
+      }
+    }, /*#__PURE__*/React__default.createElement("div", {
+      style: {
+        fontWeight: 800,
+        fontSize: 20,
+        margin: 10
+      }
+    }, "Retailers"), this.state.ecom.slice(0, 24).map(function (item) {
+      return /*#__PURE__*/React__default.createElement("div", {
+        style: {
+          margin: 5,
+          borderRadius: 5,
+          height: 200,
+          width: 150,
+          display: "inline-block"
+        }
+      }, /*#__PURE__*/React__default.createElement("a", {
+        href: "/p/" + item["id"]
+      }, /*#__PURE__*/React__default.createElement("img", {
+        src: item.img_url,
+        style: {
+          height: 200,
+          width: "auto",
+          borderRadius: 5
+        }
+      }), /*#__PURE__*/React__default.createElement("h5", {
+        style: {
+          margin: 0
+        }
+      }, item["og:title"], ": $", item["og:price:amount"]), /*#__PURE__*/React__default.createElement("h5", {
+        style: {
+          margin: 0
+        }
+      }, "Aritzia")));
+    }), this.state.feed.length ? /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement(Gallery__default, {
+      photos: this.state.feed,
+      columns: 5,
+      margin: 7,
+      renderImage: function renderImage(props) {
+        console.log("post detail", props);
+        return /*#__PURE__*/React__default.createElement(SelectedImage, _extends({}, props, {
+          boards: _this25.state.boards,
+          user: _this25.state.user
+        }));
+      },
+      direction: "column",
+      onClick: function onClick(e, i, a) {
+        var inf = i.photo.src.split("/")[5];
+        window.location.href = "/influencer/" + inf;
+      }
+    }), /*#__PURE__*/React__default.createElement("div", {
+      style: {
+        marginBottom: 20,
+        marginTop: 10,
+        visibility: this.state.loading ? "visible" : "hidden"
+      }
+    }, /*#__PURE__*/React__default.createElement(Spinner, {
+      size: 20
+    }), /*#__PURE__*/React__default.createElement("br", null), /*#__PURE__*/React__default.createElement("br", null))) : /*#__PURE__*/React__default.createElement("div", null)));
+  };
+
+  return ChromePostDetails;
+}(React__default.Component);
+var SearchPage = /*#__PURE__*/function (_React$Component8) {
+  _inheritsLoose(SearchPage, _React$Component8);
 
   function SearchPage(props) {
-    var _this18;
+    var _this26;
 
-    _this18 = _React$Component6.call(this, props) || this;
-    _this18.state = {
+    _this26 = _React$Component8.call(this, props) || this;
+    _this26.state = {
       feed: [],
       currentImage: 0,
       setCurrentImage: 0,
@@ -1332,17 +1809,17 @@ var SearchPage = /*#__PURE__*/function (_React$Component6) {
       setViewerIsOpen: false,
       currentPost: ""
     };
-    return _this18;
+    return _this26;
   }
 
-  var _proto6 = SearchPage.prototype;
+  var _proto8 = SearchPage.prototype;
 
-  _proto6.getSize = function getSize(img) {
+  _proto8.getSize = function getSize(img) {
     try {
       var src = img.url;
-      return Promise.resolve(reactImageSize(src)).then(function (_ref8) {
-        var width = _ref8.width,
-            height = _ref8.height;
+      return Promise.resolve(reactImageSize(src)).then(function (_ref12) {
+        var width = _ref12.width,
+            height = _ref12.height;
         return _extends({
           width: width,
           height: height,
@@ -1354,22 +1831,22 @@ var SearchPage = /*#__PURE__*/function (_React$Component6) {
     }
   };
 
-  _proto6.loadData = function loadData() {
+  _proto8.loadData = function loadData() {
     try {
-      var _this20 = this;
+      var _this28 = this;
 
       console.log(API_URL);
-      var _this = _this20;
-      return Promise.resolve(fetch(API_URL + "/search/" + _this20.props.match.params.query)).then(function (res) {
+      var _this = _this28;
+      return Promise.resolve(fetch(API_URL + "/search/" + _this28.props.match.params.query)).then(function (res) {
         return Promise.resolve(res.json()).then(function (result) {
           var feed = result.map(function (img) {
             return _this.getSize(img);
           });
-          return Promise.resolve(Promise.all(feed)).then(function (_Promise$all4) {
-            feed = _Promise$all4;
-            var _feed = _this20.state.feed;
+          return Promise.resolve(Promise.all(feed)).then(function (_Promise$all5) {
+            feed = _Promise$all5;
+            var _feed = _this28.state.feed;
 
-            _this20.setState({
+            _this28.setState({
               feed: _feed.concat(feed)
             });
           });
@@ -1380,12 +1857,12 @@ var SearchPage = /*#__PURE__*/function (_React$Component6) {
     }
   };
 
-  _proto6.componentDidMount = function componentDidMount() {
+  _proto8.componentDidMount = function componentDidMount() {
     this.loadData();
   };
 
-  _proto6.render = function render() {
-    var _this21 = this;
+  _proto8.render = function render() {
+    var _this29 = this;
 
     console.log(this.props);
     var qry = this.props.match.params.query.replace("+", " ");
@@ -1400,7 +1877,7 @@ var SearchPage = /*#__PURE__*/function (_React$Component6) {
       margin: 7,
       renderImage: function renderImage(props) {
         console.log("props", props);
-        console.log(_this21.state.feed);
+        console.log(_this29.state.feed);
         return /*#__PURE__*/React__default.createElement(SelectedImage, props);
       },
       direction: "column",
@@ -1416,23 +1893,23 @@ var SearchPage = /*#__PURE__*/function (_React$Component6) {
 function Home() {
   return /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("h2", null, "Home"));
 }
-var Boards = /*#__PURE__*/function (_React$Component7) {
-  _inheritsLoose(Boards, _React$Component7);
+var Boards = /*#__PURE__*/function (_React$Component9) {
+  _inheritsLoose(Boards, _React$Component9);
 
   function Boards(props) {
-    var _this22;
+    var _this30;
 
-    _this22 = _React$Component7.call(this, props) || this;
-    _this22.state = {
+    _this30 = _React$Component9.call(this, props) || this;
+    _this30.state = {
       boards: [],
       userId: null
     };
-    return _this22;
+    return _this30;
   }
 
-  var _proto7 = Boards.prototype;
+  var _proto9 = Boards.prototype;
 
-  _proto7.componentWillMount = function componentWillMount() {
+  _proto9.componentWillMount = function componentWillMount() {
     var db = firebase.firestore();
 
     var _this = this;
@@ -1462,14 +1939,14 @@ var Boards = /*#__PURE__*/function (_React$Component7) {
     });
   };
 
-  _proto7.addBoard = function addBoard(boards) {
+  _proto9.addBoard = function addBoard(boards) {
     this.setState({
       boards: boards
     });
   };
 
-  _proto7.render = function render() {
-    var _this23 = this;
+  _proto9.render = function render() {
+    var _this31 = this;
 
     return /*#__PURE__*/React__default.createElement("div", {
       style: {
@@ -1479,7 +1956,7 @@ var Boards = /*#__PURE__*/function (_React$Component7) {
       }
     }, /*#__PURE__*/React__default.createElement("h2", null, "Boards"), /*#__PURE__*/React__default.createElement(DialogExample, {
       addBoard: function addBoard(board) {
-        _this23.addBoard(board);
+        _this31.addBoard(board);
       },
       boards: this.state.boards
     }), /*#__PURE__*/React__default.createElement("br", null), /*#__PURE__*/React__default.createElement("br", null), /*#__PURE__*/React__default.createElement("br", null), this.state.boards.map(function (board) {
@@ -1505,31 +1982,31 @@ function About() {
 function Dashboard() {
   return /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("h2", null, "Dashboard"));
 }
-var AuthScreen = /*#__PURE__*/function (_React$Component8) {
-  _inheritsLoose(AuthScreen, _React$Component8);
+var AuthScreen = /*#__PURE__*/function (_React$Component10) {
+  _inheritsLoose(AuthScreen, _React$Component10);
 
   function AuthScreen(props) {
-    var _this24;
+    var _this32;
 
-    _this24 = _React$Component8.call(this, props) || this;
-    _this24.state = {
+    _this32 = _React$Component10.call(this, props) || this;
+    _this32.state = {
       authScreen: true,
       login: true,
       signup: false
     };
-    _this24.loginEmailInput = React__default.createRef();
-    _this24.loginPasswordInput = React__default.createRef();
-    _this24.signupEmailInput = React__default.createRef();
-    _this24.signupPasswordInput = React__default.createRef();
-    _this24.authScreen = React__default.createRef();
-    _this24.appScreen = React__default.createRef();
-    return _this24;
+    _this32.loginEmailInput = React__default.createRef();
+    _this32.loginPasswordInput = React__default.createRef();
+    _this32.signupEmailInput = React__default.createRef();
+    _this32.signupPasswordInput = React__default.createRef();
+    _this32.authScreen = React__default.createRef();
+    _this32.appScreen = React__default.createRef();
+    return _this32;
   }
 
-  var _proto8 = AuthScreen.prototype;
+  var _proto10 = AuthScreen.prototype;
 
-  _proto8.render = function render() {
-    var _this25 = this;
+  _proto10.render = function render() {
+    var _this33 = this;
 
     return /*#__PURE__*/React__default.createElement("div", {
       ref: this.authScreen,
@@ -1552,7 +2029,7 @@ var AuthScreen = /*#__PURE__*/function (_React$Component8) {
       onClick: function onClick() {
         console.log("signup");
 
-        _this25.setState({
+        _this33.setState({
           signup: true,
           login: false
         });
@@ -1567,7 +2044,7 @@ var AuthScreen = /*#__PURE__*/function (_React$Component8) {
       onClick: function onClick() {
         console.log("login");
 
-        _this25.setState({
+        _this33.setState({
           signup: false,
           login: true
         });
@@ -1597,12 +2074,12 @@ var AuthScreen = /*#__PURE__*/function (_React$Component8) {
       large: true
     }), /*#__PURE__*/React__default.createElement("br", null), /*#__PURE__*/React__default.createElement("br", null), /*#__PURE__*/React__default.createElement("br", null), /*#__PURE__*/React__default.createElement("button", {
       onClick: function onClick() {
-        console.log(_this25.loginEmailInput.value);
-        console.log(_this25.loginPasswordInput.value);
-        var email = _this25.loginEmailInput.current.value;
-        var password = _this25.loginPasswordInput.current.value;
+        console.log(_this33.loginEmailInput.value);
+        console.log(_this33.loginPasswordInput.value);
+        var email = _this33.loginEmailInput.current.value;
+        var password = _this33.loginPasswordInput.current.value;
         console.log("login", email, password);
-        var _this = _this25;
+        var _this = _this33;
         firebase.auth().signInWithEmailAndPassword(email, password).then(function (userCredential) {
           console.log("login user", userCredential);
           localStorage.setItem('dryp-auth', JSON.stringify(userCredential));
@@ -1649,16 +2126,16 @@ var AuthScreen = /*#__PURE__*/function (_React$Component8) {
       large: true
     }), /*#__PURE__*/React__default.createElement("br", null), /*#__PURE__*/React__default.createElement("br", null), /*#__PURE__*/React__default.createElement("br", null), /*#__PURE__*/React__default.createElement("button", {
       onClick: function onClick() {
-        console.log(_this25.signupEmailInput);
-        console.log(_this25.signupPasswordInput);
-        var email = _this25.signupEmailInput.current.value;
-        var password = _this25.signupPasswordInput.current.value;
+        console.log(_this33.signupEmailInput);
+        console.log(_this33.signupPasswordInput);
+        var email = _this33.signupEmailInput.current.value;
+        var password = _this33.signupPasswordInput.current.value;
         console.log(email, password);
         firebase.auth().createUserWithEmailAndPassword(email, password).then(function (userCredential) {
           console.log(userCredential);
           localStorage.setItem('dryp-auth', JSON.stringify(userCredential));
 
-          _this25.setState({
+          _this33.setState({
             appScreen: true,
             authScreen: false,
             user: userCredential
@@ -1682,6 +2159,7 @@ var ExampleComponent = function ExampleComponent(_ref) {
 exports.About = About;
 exports.AuthScreen = AuthScreen;
 exports.Boards = Boards;
+exports.ChromePostDetails = ChromePostDetails;
 exports.Dashboard = Dashboard;
 exports.DialogExample = DialogExample;
 exports.ExampleComponent = ExampleComponent;
