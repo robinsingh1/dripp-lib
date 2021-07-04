@@ -195,25 +195,44 @@ class App extends React.Component  {
 }
 }
 
-export class MainNav extends React.Component {
+class MainNav extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      user: null
+      user: null,
+      width: 0, height: 0
     }
   }
 
+  componentDidMount() {
+    this.updateWindowDimensions();
+    window.addEventListener('resize', this.updateWindowDimensions);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.updateWindowDimensions);
+  }
+
+  updateWindowDimensions = () => {
+    this.setState({ width: window.innerWidth, height: window.innerHeight });
+  }
+  
   render() {
+    console.log(this.state)
+    let logoGroupStyle = (this.state.width > 500) ? {marginLeft:90} : {marginLeft:10}
+    let rightGroupStyle = (this.state.width > 500) ? {marginRight:90} : {marginRight:10,display:"none"}
+    let searchStyle = (this.state.width > 500) ? {marginLeft:50} : {marginLeft:50,display:"none"}
+
     return (
       <Navbar style={{position:"fixed",top:0,zIndex:11}}>
-          <Navbar.Group align={Alignment.LEFT} style={{marginLeft:90}}>
+          <Navbar.Group align={Alignment.LEFT} style={logoGroupStyle}>
               <Navbar.Heading>
                 <a href="/"><img src={"/Group 33.png"} style={{marginTop:5, height:50}}/></a>
               </Navbar.Heading>
           </Navbar.Group>
 
           <Navbar.Group>
-            <div className="bp3-input-group" style={{marginLeft:50}}>
+            <div className="bp3-input-group" style={searchStyle}>
               <form onSubmit={(e) => { 
                 e.preventDefault()
                 console.log("submit")
@@ -225,11 +244,16 @@ export class MainNav extends React.Component {
             </div>
           </Navbar.Group>
 
-          <Navbar.Group align={Alignment.RIGHT} style={{marginRight:90}}>
+          <Navbar.Group align={Alignment.RIGHT} style={{margnRight:10}}>
+            <ShoppingCart height={20}/>
+            <Search height={20}/>
+            <ExternalLink height={20}/>
+          </Navbar.Group>
+
+          <Navbar.Group align={Alignment.RIGHT} style={rightGroupStyle}>
             <Button className="bp3-minimal bp3-large" icon="shopping-cart" text="$0.00" style={{display:"none"}}/>
             <Button className="bp3-minimal bp3-large" icon="bookmark" text="" onClick={() => window.location.href = "/boards"}/>
               <Button className="bp3-minimal bp3-large" icon="user" text="" />
-
               {(!this.props.user) ? <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={firebase.auth()} /> : <a onClick={() => 
                 firebase.auth().signOut()
               }>Sign-out</a>
