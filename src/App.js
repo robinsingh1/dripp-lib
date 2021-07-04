@@ -17,6 +17,7 @@ import firebase from 'firebase';
 import { render } from '@testing-library/react';
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
 import { photos } from "./photos";
+import { ShoppingCart, Search, ExternalLink, XCircle } from 'react-feather';
 import {
   BrowserRouter as Router,
   Switch,
@@ -25,13 +26,13 @@ import {
   Link
 } from "react-router-dom";
 import FeatherIcon from 'feather-icons-react';
-import { ShoppingCart } from 'react-feather';
+
 import Carousel, { Modal, ModalGateway } from "react-images";
 import React, { useState, useCallback } from "react";
 import Masonry from 'react-masonry-css'
 import reactImageSize from 'react-image-size';
-import "@blueprintjs/core/lib/css/blueprint.css";
-import "@blueprintjs/icons/lib/css/blueprint-icons.css";
+//import "@blueprintjs/core/lib/css/blueprint.css";
+//import "@blueprintjs/icons/lib/css/blueprint-icons.css";
 
 import './App.css';
 
@@ -198,7 +199,7 @@ class App extends React.Component  {
 }
 }
 
-class MainNav extends React.Component {
+export class MainNav extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -217,7 +218,10 @@ class MainNav extends React.Component {
   }
 
   updateWindowDimensions = () => {
-    this.setState({ width: window.innerWidth, height: window.innerHeight });
+    let width = document.querySelector("#my-extension-root").offsetWidth
+    let height = document.querySelector("#my-extension-root").offsetHeight
+
+    this.setState({ width: width, height: height });
   }
   
   render() {
@@ -230,7 +234,7 @@ class MainNav extends React.Component {
       <Navbar style={{position:"fixed",top:0,zIndex:11}}>
           <Navbar.Group align={Alignment.LEFT} style={logoGroupStyle}>
               <Navbar.Heading>
-                <a href="/"><img src={"/Group 33.png"} style={{marginTop:5, height:50}}/></a>
+                <a href="/"><img src={"https://storage.googleapis.com/dripp-public/webassets/Group%2033.png"} style={{marginTop:5, height:50}}/></a>
               </Navbar.Heading>
           </Navbar.Group>
 
@@ -248,9 +252,12 @@ class MainNav extends React.Component {
           </Navbar.Group>
 
           <Navbar.Group align={Alignment.RIGHT} style={{margnRight:10}}>
+            <div>
             <ShoppingCart height={20}/>
             <Search height={20}/>
+            </div>
             <ExternalLink height={20}/>
+            <XCircle height={20}/>
           </Navbar.Group>
 
           <Navbar.Group align={Alignment.RIGHT} style={rightGroupStyle}>
@@ -823,7 +830,7 @@ export class ChromePostDetails extends React.Component {
       viewerIsOpen: false,
       setViewerIsOpen: false,
       currentPost: "",
-      currentImage:"https://idsb.tmgrup.com.tr/ly/uploads/images/2020/07/08/45343.jpg",
+      //currentImage:"https://idsb.tmgrup.com.tr/ly/uploads/images/2020/07/08/45343.jpg",
       recs: [],
       recsPage:1,
       loading:true,
@@ -842,7 +849,7 @@ export class ChromePostDetails extends React.Component {
 
 async loadEcomData() {
   let id = null;
-  let params = {user: 1, url: this.state.currentImage}
+  let params = {user: 1, url: this.props.currentImage}
   params = new URLSearchParams(params).toString()
   id = 1
   let ecom_req = await fetch(`${API_URL}/chrome_ecom/${id}?${params}`,)
@@ -911,6 +918,13 @@ async loadData() {
     recsPage: recsPage
   });
     
+}
+
+componentDidUpdate(prevProps) {
+  // Typical usage (don't forget to compare props):
+  if (this.props.currentImage !== prevProps.currentImage) {
+    this.loadEcomData();
+  }
 }
 
 componentDidMount(){
@@ -986,7 +1000,6 @@ render() {
     <div>
       <br/>
       <br/>
-      <br/>
       <div style={{fontWeight:800,fontSize:20,margin:20}}>Shop this look</div>
       <div style={{marginLeft:10,marginRight:20,paddingTop:0,paddingLeft:0,
     borderRadius: 20}} className="post-details-area">
@@ -995,8 +1008,8 @@ render() {
     
          <img
             id="main"
-            alt={this.state.currentPost.title}
-            src={this.state.currentImage}
+            //alt={this.state.currentPost.title}
+            src={this.props.currentImage}
             style={{boxShadow: '0px 10px 30px rgb(0 0 0 / 25%)', borderTopLeftRadius:20,borderBottomLeftRadius:20,borderRadius:20,opacity:1,top:0,left:0,zIndex:3,height:630,maxWidth:"80%",maxHeight:"100%",marginRight:"auto",marginLeft:"auto"}}
         />
         </div>

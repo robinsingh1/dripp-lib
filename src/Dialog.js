@@ -34,7 +34,7 @@ var firebaseConfig = {
   measurementId: "G-MEASUREMENT_ID",
 }
 // Initialize Firebase
-firebase.initializeApp(firebaseConfig);
+//firebase.initializeApp(firebaseConfig);
 */
 
 
