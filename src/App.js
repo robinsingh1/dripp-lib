@@ -78,7 +78,7 @@ console.log(window.location.origin)
 let API_URL = (window.location.origin.includes("localhost")) ? 'http://localhost:5000' : 'https://dripp-py.herokuapp.com'
 API_URL = (window.location.origin.includes("gitpod")) ? 'https://5000-peach-cat-avh4l9cg.ws-us08.gitpod.io' : API_URL
 API_URL = 'https://5000-peach-cat-avh4l9cg.ws-us10.gitpod.io'
-
+//API_URL = 'https://dripp-py-flask-infer-ohzllhpmcq-ue.a.run.app/'
 
 //API_URL = 'https://dripp-py.herokuapp.com'
 /*
@@ -1077,7 +1077,9 @@ render() {
 
 
       <div style={{marginLeft:0,marginRight:0,marginTop:-50}}>
-      <div style={{fontWeight:800,fontSize:20,margin:10}}>Retailers</div>
+      <div style={{fontWeight:800,fontSize:20,margin:10}}>
+        Retailers
+      </div>
 
       {this.state.ecom.slice(0, 24).map(function(item){
            return (
