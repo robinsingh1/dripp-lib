@@ -252,12 +252,20 @@ export class MainNav extends React.Component {
           </Navbar.Group>
 
           <Navbar.Group align={Alignment.RIGHT} style={{margnRight:10}}>
-            <div>
+            <div style={{display:"none"}}>
             <ShoppingCart height={20}/>
             <Search height={20}/>
-            </div>
             <ExternalLink height={20}/>
+            </div>
+
+            <div style={{cursor:"pointer"}} onClick={()=>{ 
+              console.log("hide")
+              console.log(document.querySelector("#my-extension-root"))
+              document.querySelector("#my-extension-root").style.display = "none"
+              //$('#my-extension-root').hide()
+              }}>
             <XCircle height={20}/>
+            </div>
           </Navbar.Group>
 
           <Navbar.Group align={Alignment.RIGHT} style={rightGroupStyle}>
