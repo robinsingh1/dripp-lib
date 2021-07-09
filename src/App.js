@@ -813,6 +813,44 @@ export class InfluencerPostDetails extends React.Component {
                 }
 }
 
+
+export class LoginScreen extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+    }
+  }
+
+  render() {
+    return (
+      <div style={{overflow:"hidden"}}>
+        <div style={{position:"absolute",zIndex:2,width:"100%"}}>
+          <div style={{fontWeight:"black",fontFamily:"Poppins",width:"45%",float:"left",
+                        paddingLeft:100,marginTop:100}}>
+                          <img src="./Group 76.png" style={{height:50}}/>
+
+            <h1>Get started with your personal shopping assistant.</h1>
+            <h4>Shop your favorite influencers styles</h4>
+            <h4>Price match similar outfits in retailer</h4>
+            <h4>Join the largest fashion community</h4>
+          </div>
+          <div style={{width:"20%",marginRight:100,float:"right"}}>
+          <div style={{fontWeight:"800",fontStyle:"poppins",padding:100,paddingBottom:100,width:300,
+                      marginTop:130,backgroundColor:"white",boxShadow: "0px 10px 30px rgba(0, 0, 0, 0.25)",
+                      borderRadius:50,height:300}}>
+                        <AuthScreen />
+          </div>
+          </div>
+        </div>
+      <div style={{background: "linear-gradient(89.53deg, rgba(255, 255, 255, 0.95) 45.81%, rgba(255, 255, 255, 0.1) 103.91%)",
+                  height:100,width:100,position:"absolute",top:0,left:0,zIndex:1,height:"100%",width:"100%"}}></div>
+      <img src="./fash_pint.png" style={{filter: "blur(3px)",position:"absolute",top:0,right:0,zIndex:0,height:"100%"}}/>
+      </div>
+    )
+  }
+}
+
+
 export class Template extends React.Component {
   constructor(props) {
     super(props)

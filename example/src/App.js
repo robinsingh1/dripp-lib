@@ -16,7 +16,8 @@ import {
   Boards,
   Dashboard,
   AuthScreen,
-  Home
+  Home,
+  LoginScreen
 } from 'dripp-lib'
 
 import {
@@ -41,7 +42,8 @@ class App extends React.Component  {
           <Route exact path="/" component={HomeFeed}>
           
           </Route>
-
+          <Route path="/auth" component={LoginScreen}>
+          </Route>
           <Route path="/@:name" component={InfluencerProfile}>
           </Route>
           <Route path="/post/:id" component={InfluencerPostDetails} >

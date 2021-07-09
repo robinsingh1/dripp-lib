@@ -16,7 +16,8 @@ import {
   Boards,
   Dashboard,
   Home,
-  AuthScreen
+  AuthScreen,
+  LoginScreen
 } from "./App";
 
 export const ExampleComponent = ({ text }) => {
@@ -40,5 +41,6 @@ export {
   Boards,
   Dashboard,
   Home,
-  AuthScreen
+  AuthScreen,
+  LoginScreen
 }
