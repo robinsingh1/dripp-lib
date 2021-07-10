@@ -31,7 +31,7 @@ import Carousel, { Modal, ModalGateway } from "react-images";
 import React, { useState, useCallback } from "react";
 import Masonry from 'react-masonry-css'
 import reactImageSize from 'react-image-size';
-//import "@blueprintjs/core/lib/css/blueprint.css";
+import "@blueprintjs/core/lib/css/blueprint.css";
 //import "@blueprintjs/icons/lib/css/blueprint-icons.css";
 
 import './App.css';
@@ -829,15 +829,15 @@ export class LoginScreen extends React.Component {
                         paddingLeft:100,marginTop:100}}>
                           <img src="./Group 76.png" style={{height:50}}/>
 
-            <h1>Get started with your personal shopping assistant.</h1>
-            <h4>Shop your favorite influencers styles</h4>
-            <h4>Price match similar outfits in retailer</h4>
-            <h4>Join the largest fashion community</h4>
+            <h1 style={{fontSize:40}}>Get started with your personal shopping assistant.</h1>
+            <h4 style={{fontFamily:"Open Sans",fontSize:24,fontWeight:100}}>Shop your favorite influencers styles</h4>
+            <h4 style={{fontFamily:"Open Sans",fontSize:24,fontWeight:100}}>Price match similar outfits in retailer</h4>
+            <h4 style={{fontFamily:"Open Sans",fontSize:24,fontWeight:100}}>Join the largest fashion community</h4>
           </div>
-          <div style={{width:"20%",marginRight:100,float:"right"}}>
-          <div style={{fontWeight:"800",fontStyle:"poppins",padding:100,paddingBottom:100,width:300,
+          <div style={{width:"20%",marginLeft:200,float:"left",height:300,width:400}}>
+          <div style={{fontWeight:"800",fontStyle:"poppins",padding:50,paddingBottom:50,
                       marginTop:130,backgroundColor:"white",boxShadow: "0px 10px 30px rgba(0, 0, 0, 0.25)",
-                      borderRadius:50,height:300}}>
+                      borderRadius:50}}>
                         <AuthScreen />
           </div>
           </div>
