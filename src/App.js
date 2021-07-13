@@ -77,8 +77,8 @@ const uiConfig = {
 console.log(window.location.origin)
 let API_URL = (window.location.origin.includes("localhost")) ? 'http://localhost:5000' : 'https://dripp-py.herokuapp.com'
 API_URL = (window.location.origin.includes("gitpod")) ? 'https://5000-peach-cat-avh4l9cg.ws-us08.gitpod.io' : API_URL
-API_URL = 'https://5000-peach-cat-avh4l9cg.ws-us11.gitpod.io'
-//API_URL = 'https://dripp-py-flask-infer-ohzllhpmcq-ue.a.run.app/'
+//API_URL = 'https://5000-peach-cat-avh4l9cg.ws-us11.gitpod.io'
+API_URL = 'https://dripp-py-flask-infer-ohzllhpmcq-ue.a.run.app'
 
 //API_URL = 'https://dripp-py.herokuapp.com'
 /*
