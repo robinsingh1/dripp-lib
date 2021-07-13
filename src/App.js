@@ -1004,10 +1004,11 @@ async loadEcomData() {
   let params = {user: 1, url: this.props.currentImage}
   params = new URLSearchParams(params).toString()
   id = 1
+  this.setState({loading:true})
   let ecom_req = await fetch(`${API_URL}/chrome_ecom/${id}?${params}`,)
-    let ecom = await ecom_req.json()
-    console.log("ecom",ecom)
-    this.setState({ecom: ecom})
+  let ecom = await ecom_req.json()
+  console.log("ecom",ecom)
+  this.setState({ecom: ecom, loading:false})
   }
 }
 
@@ -1075,6 +1076,8 @@ async loadData() {
 
 componentDidUpdate(prevProps) {
   // Typical usage (don't forget to compare props):
+  console.log("did update",prevProps)
+  //this.setState({loading:true})
   if (this.props.currentImage !== prevProps.currentImage) {
     this.loadEcomData();
   }
