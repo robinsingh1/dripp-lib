@@ -16,7 +16,9 @@ import {
   Boards,
   Dashboard,
   AuthScreen,
-  Home
+  Home,
+  LoginScreen,
+  PrivacyPolicy
 } from 'dripp-lib'
 
 import {
@@ -41,12 +43,18 @@ class App extends React.Component  {
           <Route exact path="/" component={HomeFeed}>
           
           </Route>
-
+          <Route path="/auth" component={LoginScreen}>
+          </Route>
+          <Route path="/privacy" component={PrivacyPolicy}>
+          </Route>
           <Route path="/@:name" component={InfluencerProfile}>
           </Route>
           <Route path="/post/:id" component={InfluencerPostDetails} >
           </Route>
           <Route path="/chrome/:id" component={ChromePostDetails} >
+          </Route>
+          <Route path="/c" >
+            <ChromePostDetails currentImage={"https://i.pinimg.com/originals/a1/f4/6b/a1f46b66467f9a37b72a4346c3a49bdf.jpg"} />
           </Route>
 
           <Route path="/login" component={AuthScreen} >
