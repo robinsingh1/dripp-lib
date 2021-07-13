@@ -11,7 +11,7 @@ import {
   Navbar,
 } from "@blueprintjs/core";
 import { GoogleLogin } from 'react-google-login';
-import { Card, Elevation } from "@blueprintjs/core";
+import { Card, Elevation, Spinner } from "@blueprintjs/core";
 import DialogExample from './Dialog'
 import firebase from 'firebase';
 import { render } from '@testing-library/react';
@@ -77,8 +77,8 @@ const uiConfig = {
 console.log(window.location.origin)
 let API_URL = (window.location.origin.includes("localhost")) ? 'http://localhost:5000' : 'https://dripp-py.herokuapp.com'
 API_URL = (window.location.origin.includes("gitpod")) ? 'https://5000-peach-cat-avh4l9cg.ws-us08.gitpod.io' : API_URL
-API_URL = 'https://5000-peach-cat-avh4l9cg.ws-us11.gitpod.io'
-//API_URL = 'https://dripp-py-flask-infer-ohzllhpmcq-ue.a.run.app/'
+//API_URL = 'https://5000-peach-cat-avh4l9cg.ws-us11.gitpod.io'
+API_URL = 'https://dripp-py-flask-infer-ohzllhpmcq-ue.a.run.app'
 
 //API_URL = 'https://dripp-py.herokuapp.com'
 /*
@@ -976,7 +976,7 @@ export class ChromePostDetails extends React.Component {
     super(props)
     this.state = {
       feed: [],
-      currentImage:0,
+      currentImage: props.currentImage,
       setCurrentImage:0,
       viewerIsOpen: false,
       setViewerIsOpen: false,
@@ -1000,6 +1000,7 @@ export class ChromePostDetails extends React.Component {
 
 async loadEcomData() {
   let id = null;
+  if(this.props.currentImage) {
   let params = {user: 1, url: this.props.currentImage}
   params = new URLSearchParams(params).toString()
   id = 1
@@ -1007,6 +1008,7 @@ async loadEcomData() {
     let ecom = await ecom_req.json()
     console.log("ecom",ecom)
     this.setState({ecom: ecom})
+  }
 }
 
 async loadData() {
@@ -1083,9 +1085,11 @@ componentDidMount(){
     this.loadEcomData() 
 
     console.log("yo did mount")
+    /*
     window.addEventListener('scroll', (e) => { 
       this.loadMore() 
     });
+    */
 
     document.querySelectorAll("*").forEach(element => element.addEventListener("scroll", ({target}) => console.log(target, target.id, target.parent, target.parent.id)));
 
@@ -1182,10 +1186,11 @@ render() {
                       overflowX: "scroll"}}>
             {//[...Array(15).keys()].map(function(){
               this.state.ecom.slice(0, 4).map(function(item){
-                //console.log("ecom",item)
+                console.log("ecom",item)
               return  (
                 <div style={{margin:5,borderRadius:5,height:250,width:170}}>
-                  <a href={`/p/${item["id"]}`}>
+                  yo
+                  <a href={item["og:url"]}>
                   <img src={item.img_url} style={{height:200,width:"auto",borderRadius:5}}/>
                   <h5 style={{margin:0}}>{item["og:title"]}: ${item["og:price:amount"]}</h5>
                   <h5 style={{margin:0}}>Aritzia</h5>
@@ -1207,10 +1212,13 @@ render() {
               return  (
                 <div style={{margin:5,borderRadius:5,height:250,width:170}}>
                   <a href={item["og:url"]}>
+                  
                   <img src={item.img_url} style={{height:200,width:"auto",borderRadius:5}}/>
+                  <div style={{height:30}}>
                   <h5 style={{margin:0}}>{item["og:title"]}: ${item["og:price:amount"]}</h5>
                   <h5 style={{margin:0}}>Aritzia</h5>
-                 <div style={{display:"inline-block",margin:5, height:150,width:150,backgroundColor:"blue",visibility:"hidden"}}></div>
+                  </div>
+                  <div style={{display:"inline-block",margin:5, height:150,width:150,backgroundColor:"blue",visibility:"hidden"}}></div>
                   </a>
                 </div>
               )
@@ -1232,17 +1240,23 @@ render() {
         Retailers
       </div>
 
+      {(this.state.loading) ?  <Spinner size={20} /> :
+      <div>
       {this.state.ecom.slice(0, 24).map(function(item){
            return (
            <div style={{margin:5,borderRadius:5,height:200,width:150,display:"inline-block"}}>
-              <a href={`/p/${item["id"]}`}>
+              <a href={`${item["og:url"]}`}>
               <img src={item.img_url} style={{height:200,width:"auto",borderRadius:5}}/>
+              <div style={{height:30,overflow:"hidden"}}>
               <h5 style={{margin:0}}>{item["og:title"]}: ${item["og:price:amount"]}</h5>
               <h5 style={{margin:0}}>Aritzia</h5>
+              </div>
               </a>
             </div>
            )
        })}
+       </div>}
+
       {(this.state.feed.length) ? 
       <div>
 
@@ -1500,7 +1514,12 @@ export class AuthScreen extends React.Component {
           <br/>
           <br/>
           <br/>
-          <button onClick={() => { 
+          <button 
+                      role="button" 
+                      className="bp3-button bp3-primary bp3-large bp3-minimal"
+                      style={{width:100,height:30,borderRadius:5,color:"white",backgroundColor:"blue",fontWeight:"bold"}}
+          
+          onClick={() => { 
             console.log(this.loginEmailInput.value)
             console.log(this.loginPasswordInput.value)
  
@@ -1528,7 +1547,7 @@ export class AuthScreen extends React.Component {
               var errorMessage = error.message;
             });
 
-          }}>Login</button>
+          }}>LOGIN</button>
  
           </form>
 
@@ -1548,7 +1567,12 @@ export class AuthScreen extends React.Component {
           <br/>
           <br/>
           
-          <button onClick={() => { 
+          <a 
+            role="button" 
+            className="bp3-button bp3-primary bp3-large bp3-minimal"
+            style={{width:100,height:30,borderRadius:5,color:"white",backgroundColor:"blue"}}
+
+            onClick={() => { 
             console.log(this.signupEmailInput)
             console.log(this.signupPasswordInput)
             var email = this.signupEmailInput.current.value
@@ -1571,7 +1595,7 @@ export class AuthScreen extends React.Component {
             });
           
 
-          }}>Signup</button>          
+          }}>SIGN UP</a>          
           </form>
         </div>
     )

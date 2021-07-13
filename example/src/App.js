@@ -53,6 +53,9 @@ class App extends React.Component  {
           </Route>
           <Route path="/chrome/:id" component={ChromePostDetails} >
           </Route>
+          <Route path="/c" >
+            <ChromePostDetails currentImage={"https://i.pinimg.com/originals/a1/f4/6b/a1f46b66467f9a37b72a4346c3a49bdf.jpg"} />
+          </Route>
 
           <Route path="/login" component={AuthScreen} >
           </Route>
