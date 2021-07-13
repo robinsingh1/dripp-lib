@@ -17,7 +17,8 @@ import {
   Dashboard,
   Home,
   AuthScreen,
-  LoginScreen
+  LoginScreen,
+  PrivacyPolicy
 } from "./App";
 
 export const ExampleComponent = ({ text }) => {
@@ -42,5 +43,6 @@ export {
   Dashboard,
   Home,
   AuthScreen,
-  LoginScreen
+  LoginScreen,
+  PrivacyPolicy
 }

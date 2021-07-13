@@ -17,7 +17,8 @@ import {
   Dashboard,
   AuthScreen,
   Home,
-  LoginScreen
+  LoginScreen,
+  PrivacyPolicy
 } from 'dripp-lib'
 
 import {
@@ -43,6 +44,8 @@ class App extends React.Component  {
           
           </Route>
           <Route path="/auth" component={LoginScreen}>
+          </Route>
+          <Route path="/privacy" component={PrivacyPolicy}>
           </Route>
           <Route path="/@:name" component={InfluencerProfile}>
           </Route>
